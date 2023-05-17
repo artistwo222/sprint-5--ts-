@@ -19,34 +19,61 @@ const addJokeToReport = (joke: string, score: number): void => {
     console.log(reportAcudits);
 };
 
+// Variables globales para los listeners de los botones de puntuación
+let buenoListener: EventListener;
+let regularListener: EventListener;
+let maloListener: EventListener;
+
 // Cargar una broma aleatoria desde una API y mostrarla en el documento HTML
 const loadRandomJoke = (): void => {
     const apiUrl =
         Math.random() < 0.5
-            ? 'https://icanhazdadjoke.com/'
-            : 'https://api.chucknorris.io/jokes/random';
+            ? "https://icanhazdadjoke.com/"
+            : "https://api.chucknorris.io/jokes/random";
 
-    fetch(apiUrl, { headers: { Accept: 'application/json' } })
-        .then(response => response.json())
-        .then(data => {
-            const jokeOutput = document.getElementById('joke');
+    fetch(apiUrl, { headers: { Accept: "application/json" } })
+        .then((response) => response.json())
+        .then((data) => {
+            const jokeOutput = document.getElementById("joke");
             if (jokeOutput) {
                 jokeOutput.innerHTML = data.value || data.joke;
 
-                // Agregar listeners a los botones de puntuación para reportar la broma
-                document.querySelector('.btn-bueno')?.addEventListener('click', () =>
-                    addJokeToReport(jokeOutput.innerHTML, 3)
-                );
-                document.querySelector('.btn-regular')?.addEventListener('click', () =>
-                    addJokeToReport(jokeOutput.innerHTML, 2)
-                );
-                document.querySelector('.btn-malo')?.addEventListener('click', () =>
-                    addJokeToReport(jokeOutput.innerHTML, 1)
-                );
+                // Eliminar los listeners anteriores
+                if (buenoListener) {
+                    document
+                        .querySelector(".btn-bueno")
+                        ?.removeEventListener("click", buenoListener);
+                }
+                if (regularListener) {
+                    document
+                        .querySelector(".btn-regular")
+                        ?.removeEventListener("click", regularListener);
+                }
+                if (maloListener) {
+                    document
+                        .querySelector(".btn-malo")
+                        ?.removeEventListener("click", maloListener);
+                }
+
+                // Agregar nuevos listeners a los botones de puntuación
+                buenoListener = () => addJokeToReport(jokeOutput.innerHTML, 3);
+                regularListener = () => addJokeToReport(jokeOutput.innerHTML, 2);
+                maloListener = () => addJokeToReport(jokeOutput.innerHTML, 1);
+
+                document
+                    .querySelector(".btn-bueno")
+                    ?.addEventListener("click", buenoListener);
+                document
+                    .querySelector(".btn-regular")
+                    ?.addEventListener("click", regularListener);
+                document
+                    .querySelector(".btn-malo")
+                    ?.addEventListener("click", maloListener);
             }
         })
-        .catch(error => console.error(error));
+        .catch((error) => console.error(error));
 };
+
 
 // Agregar listeners a los botones para cargar una nueva broma aleatoria
 document.querySelector('.btn-anterior')?.addEventListener('click', loadRandomJoke);
